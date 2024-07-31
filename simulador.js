@@ -19,32 +19,130 @@ const situacionesEra1 = [
         era: 1,
         requerimientos: { GAN: 2, GRA: 2 },
         recompensas: { PV: 1, POB: 1, GRA_PROD: 1 },
-        penalizaciones: { GAN: -1, GRA_PROD: -1 },
+        penalizaciones: { GAN: 1, GRA_PROD: -1 },
     },
     {
         nombre: 'Hambruna',
         era: 1,
         requerimientos: { GAN: 2, GRA: 2 },
         recompensas: { PV: 1, POB: 1, GRA_PROD: 1 },
-        penalizaciones: { GAN: -1, GRA_PROD: -1 },
+        penalizaciones: { GAN: 1, GRA_PROD: -1 },
     },
+    {
+        nombre: 'Incendio',
+        era: 1,
+        requerimientos: { MET: 2, GRA: 3 },
+        recompensas: { PV: 1, MET: 1, MAD_PROD: 1 },
+        penalizaciones: { MAD: 1, MAD_PROD: -1 },
+    },
+    {
+        nombre: 'Incendio',
+        era: 1,
+        requerimientos: { MET: 2, GRA: 3 },
+        recompensas: { PV: 1, MET: 1, MAD_PROD: 1 },
+        penalizaciones: { MAD: 1, MAD_PROD: -1 },
+    },
+    {
+        nombre: 'Guerra',
+        era: 1,
+        requerimientos: { MET: 3, GAN: 2 },
+        recompensas: { PV: 1, REC: 2 },
+        penalizaciones: { POB: 2 },
+    },
+    {
+        nombre: 'Saqueos Nómadas',
+        era: 1,
+        requerimientos: { MET: 1, MAD: 1, GAN: 3, GRA: 1 },
+        recompensas: { PV: 2, GAN: 1 },
+        penalizaciones: { PV: 1, GRA: 1, GAN_PROD: -1 },
+    },
+    {
+        nombre: 'Saqueos Nómadas',
+        era: 1,
+        requerimientos: { MET: 1, MAD: 1, GAN: 3, GRA: 1 },
+        recompensas: { PV: 2, GAN: 1 },
+        penalizaciones: { PV: 1, GRA: 1, GAN_PROD: -1 },
+    },
+    {
+        nombre: 'Crecimiento',
+        era: 1,
+        requerimientos: { MET: 1, MAD: 2, GAN: 2, GRA: 2 },
+        recompensas: { PV: 2, REC: 3, POB: 1 },
+        penalizaciones: {},
+    },
+    {
+        nombre: 'Terremoto',
+        era: 1,
+        requerimientos: { MET: 2, MAD: 2, GAN: 2, GRA: 1 },
+        recompensas: { PV: 2, MAD: 2, MET_PROD: 1 },
+        penalizaciones: { PV: 1, MAD: 2, MET_PROD: -1 },
+    }
     // ... Añadir más situaciones aquí ...
 ];
 const situacionesEra2 = [
     {
-        nombre: 'Hambruna',
-        era: 1,
-        requerimientos: { GAN: 2, GRA: 2 },
-        recompensas: { PV: 1, POB: 1, GRA_PROD: 1 },
-        penalizaciones: { GAN: -1, GRA_PROD: -1 },
+        nombre: 'Sequía',
+        era: 2,
+        requerimientos: { GAN: 2, GRA: 4 },
+        recompensas: { PV: 1, MAD: 2, GRA_PROD: 1 },
+        penalizaciones: { PV: 1, POB: 1, "GRA/GAN": 2 },
     },
     {
-        nombre: 'Hambruna',
-        era: 1,
-        requerimientos: { GAN: 2, GRA: 2 },
-        recompensas: { PV: 1, POB: 1, GRA_PROD: 1 },
-        penalizaciones: { GAN: -1, GRA_PROD: -1 },
+        nombre: 'Sequía',
+        era: 2,
+        requerimientos: { GAN: 2, GRA: 4 },
+        recompensas: { PV: 1, MAD: 2, GRA_PROD: 1 },
+        penalizaciones: { PV: 1, POB: 1, "GRA/GAN": 2 },
     },
+    {
+        nombre: 'Terremoto',
+        era: 2,
+        requerimientos: { MET: 2, MAD: 2, GAN: 2, GRA: 1 },
+        recompensas: { PV: 2, MAD: 2, MET_PROD: 1 },
+        penalizaciones: { PV: 1, MAD: 2, MET_PROD: -1 },
+    },
+    {
+        nombre: 'Terremoto',
+        era: 2,
+        requerimientos: { MET: 2, MAD: 2, GAN: 2, GRA: 1 },
+        recompensas: { PV: 2, MAD: 2, MET_PROD: 1 },
+        penalizaciones: { PV: 1, MAD: 2, MET_PROD: -1 },
+    },
+    {
+        nombre: 'Prosperidad',
+        era: 2,
+        requerimientos: { MET: 3, GAN: 2, GRA: 2 },
+        recompensas: { PV: 2, POB: 2, REC: 4 },
+        penalizaciones: { PV: 1 },
+    },
+    {
+        nombre: 'Inundación',
+        era: 2,
+        requerimientos: { MET: 2, MAD: 3, GAN: 3 },
+        recompensas: { PV: 3, "MET/MAD": 2, "GRA/GAN": 2 },
+        penalizaciones: { MAD: 2, GRA_PROD: -1, GAN_PROD: -1 },
+    },
+    {
+        nombre: 'Inundación',
+        era: 2,
+        requerimientos: { MET: 2, MAD: 3, GAN: 3 },
+        recompensas: { PV: 3, "MET/MAD": 2, "GRA/GAN": 2 },
+        penalizaciones: { MAD: 2, GRA_PROD: -1, GAN_PROD: -1 },
+    },
+    {
+        nombre: 'Gran Guerra',
+        era: 2,
+        requerimientos: { MET: 4, MAD: 4 },
+        recompensas: { PV: 3, MET: 3, GRA_PROD: 3 },
+        penalizaciones: { POB: 4, CASA: 1 },
+    },
+    {
+        nombre: 'Gran Proyecto',
+        era: 2,
+        requerimientos: { MET: 3, MAD: 3, GAN: 2, GRA: 2 },
+        recompensas: { PV: 4, REC: 4 },
+        penalizaciones: { PV: 2, REC: 2, REC_PROD: -2 },
+    }
     // ... Añadir más situaciones aquí ...
 ];
 
@@ -84,7 +182,6 @@ function initGame(numPlayers) {
     };
 
     _.shuffle(poblados).slice(0, numPlayers).forEach((poblado, index) => {
-        // Hacer los recursos extra aca random
         players.push({
             id: index + 1,
             poblado,
@@ -98,6 +195,24 @@ function initGame(numPlayers) {
             artefactos: [],
             pv: 0
         });
+
+        // Hacer los recursos extra aca random
+        for (let i = 0; i < 2; i++) {
+            switch(Math.random(0, 3)) {
+                case 0:
+                    players[index].recursos.MET += 1
+                    break;
+                case 1:
+                    players[index].recursos.MAD += 1
+                    break;
+                case 2:
+                    players[index].recursos.GAN += 1
+                    break;
+                case 3:
+                    players[index].recursos.GRA += 1
+                    break;
+            }
+        }
     });
 
     return players;
@@ -138,6 +253,37 @@ function generarRecursos(players) {
     player.recursos.GRA += player.edificios.some(e => e.recurso === 'GRA') ? extra : 0;
 
     // Descontar manutención por pobladores
+    const totalPobladores = player.pobladores + edificiosConPobladores
+    const manutencion = Math.floor(totalPobladores / 4);
+    while(manutencion > 0) {
+        if(Math.random(0, 1) === 0) {
+            if(player.recursos.GRA > 0) {
+                player.recursos.GRA--;
+                manutencion--;
+            } else if(player.recursos.GAN > 0) {
+                player.recursos.GAN-
+                manutencion--;
+            } else {
+                break;
+            }
+        } else {
+            if(player.recursos.GAN > 0) {
+                player.recursos.GAN--;
+                manutencion--;
+            } else if(player.recursos.GRA > 0) {
+                player.recursos.GRA--;
+                manutencion--;
+            } else {
+                break;
+            }
+        }
+    }
+    const descuentoPobladores = 2 * manutencion;
+    if (player.pobladores > descuentoPobladores) {
+        player.pobladores -= descuentoPobladores;
+    } else {
+        player.pobladores = 0;
+    }
 };
 
 // Resolución de situaciones
@@ -281,6 +427,190 @@ function pobladoNeutralTiene(recursos) {
     return true;
 }
 
+// Simula acciones para cada jugador
+let edificiosComprados = [];
+function hacerAccion(jugador, era) {
+    if (era === 1) {
+        // Puede comprar edificio, casa, llamar poblador/es o pasar
+        const madera = jugador.recursos.MAD;
+        const comida = jugador.recursos.GRA + jugador.recursos.GAN;
+        const valorAleatorio = Math.random(0,10);
+        if (valorAleatorio === 0) {
+            // Pasa
+            return jugador;
+        }
+        if (madera === 0) {
+            // No hay madera
+            if (comida === 0) {
+                // No hay comida
+                return jugador;
+            }
+            // Llama pobladores
+            if (comida > 2 && ((jugador.casas * 4) - 2) >= jugador.pobladores) {
+                jugador.pobladores += 2;
+                restarComida(jugador, 2);
+            } else if (((jugador.casas * 4) - 1) >= jugador.pobladores) {
+                jugador.poladores++;
+                restarComida(jugador, 1);
+            }
+            return jugador;
+        } else {
+            if (valorAleatorio < 3) {
+                // Compra casa
+                jugador.recursos.MAD--;
+                jugador.casas++;
+                return jugador;
+            } else {
+                // Prioriza casa si no tiene más lugar para pobladores, sino edificio
+                if (jugador.casas * 4 <= jugador.pobladores) {
+                    jugador.recursos.MAD--;
+                    jugador.casas++;
+                    return jugador;
+                } else {
+                    // Edificio (si puede)
+                    if (jugador.recursos.MET > 0 || jugador.recursos.GAN > 1) {
+                        const edificioDeseado = Math.random(0, 4);
+                        let construyo = false;
+                        let vueltaEntera = 0;
+                        while(!construyo && vueltaEntera < 5) {
+                            switch(edificioDeseado) {
+                                case 0:
+                                    // Mina
+                                    if (jugador.recursos.MAD >= 1 && jugador.recursos.MET >= 2) {
+                                        if (edificiosComprados.filter(edificio => {
+                                            if (edificio === "Mina" || edificio === "Aserradero") {
+                                                return true;
+                                            }
+                                        }).count < (players.count - 1)) {
+                                            edificiosComprados.push("Mina");
+                                            if (jugador.pobladores > 0) {
+                                                edificios[0].poblador = true;
+                                            } else {
+                                                edificios[0].poblador = false;
+                                            }
+                                            jugador.edificios.push(edificios[0]);
+                                            jugador.recursos.MET -= 2;
+                                            jugador.recursos.MAD--;
+                                            return jugador;
+                                        }
+                                    }
+                                    break;
+                                case 1:
+                                    // Aserradero
+                                    if (jugador.recursos.MAD >= 2 && jugador.recursos.MET >= 1) {
+                                        if (edificiosComprados.filter(edificio => {
+                                            if (edificio === "Mina" || edificio === "Aserradero") {
+                                                return true;
+                                            }
+                                        }).count < (players.count - 1)) {
+                                            edificiosComprados.push("Aserradero");
+                                            if (jugador.pobladores > 0) {
+                                                edificios[1].poblador = true;
+                                            } else {
+                                                edificios[1].poblador = false;
+                                            }
+                                            jugador.edificios.push(edificios[1]);
+                                            jugador.recursos.MET-- ;
+                                            jugador.recursos.MAD -= 2;
+                                            return jugador;
+                                        }
+                                    }
+                                    break;
+                                case 2:
+                                    // Corral
+                                    if (jugador.recursos.MAD >= 1 && jugador.recursos.GAN >= 2) {
+                                        if (edificiosComprados.filter(edificio => {
+                                            if (edificio === "Corral" || edificio === "Molino") {
+                                                return true;
+                                            }
+                                        }).count < (players.count - 1)) {
+                                            edificiosComprados.push("Corral");
+                                            if (jugador.pobladores > 0) {
+                                                edificios[2].poblador = true;
+                                            } else {
+                                                edificios[2].poblador = false;
+                                            }
+                                            jugador.edificios.push(edificios[2]);
+                                            jugador.recursos.MAD-- ;
+                                            jugador.recursos.GAN -= 2;
+                                            return jugador;
+                                        }
+                                    }
+                                    break;
+                                case 3:
+                                    // Molino
+                                    if (jugador.recursos.MET >= 1 && jugador.recursos.MAD >= 2) {
+                                        if (edificiosComprados.filter(edificio => {
+                                            if (edificio === "Corral" || edificio === "Molino") {
+                                                return true;
+                                            }
+                                        }).count < (players.count - 1)) {
+                                            edificiosComprados.push("Molino");
+                                            if (jugador.pobladores > 0) {
+                                                edificios[3].poblador = true;
+                                            } else {
+                                                edificios[3].poblador = false;
+                                            }
+                                            jugador.edificios.push(edificios[3]);
+                                            jugador.recursos.MET-- ;
+                                            jugador.recursos.MAD -= 2;
+                                            return jugador;
+                                        }
+                                    }
+                                    break;
+                                case 4:
+                                    // Mercado
+                                    if (jugador.recursos.MET >= 2 && jugador.recursos.MAD >= 2 && jugador.recursos.GAN >= 1 && jugador.recursos.GRA >= 1) {
+                                        if (edificiosComprados.filter(edificio => {
+                                            if (edificio === "Mercado") {
+                                                return true;
+                                            }
+                                        }).count < (players.count)) {
+                                            edificiosComprados.push("Mercado");
+                                            if (jugador.pobladores > 0) {
+                                                edificios[4].poblador = true;
+                                            } else {
+                                                edificios[4].poblador = false;
+                                            }
+                                            jugador.edificios.push(edificios[4]);
+                                            jugador.recursos.MET -= 2 ;
+                                            jugador.recursos.MAD -= 2;
+                                            jugador.recursos.GAN-- ;
+                                            jugador.recursos.GRA--;
+                                            return jugador;
+                                        }
+                                    }
+                                    break;
+                            }
+                            edificioDeseado++;
+                            if (edificioDeseado === 5) {
+                                edificioDeseado = 0;
+                            }
+                            vueltaEntera++;
+                        }
+                    } else {
+                        jugador.recursos.MAD--;
+                        jugador.casas++;
+                        return jugador;
+                    }
+                }
+            }
+            if (comida > 0) {
+                // Llama pobladores
+                if (comida > 2 && ((jugador.casas * 4) - 2) >= jugador.pobladores) {
+                    jugador.pobladores += 2;
+                    restarComida(jugador, 2);
+                } else if (((jugador.casas * 4) - 1) >= jugador.pobladores) {
+                    jugador.poladores++;
+                    restarComida(jugador, 1);
+                }
+                return jugador;
+            }
+        }
+        return jugador;
+    }
+}
+
 // Simulación de una ronda del juego
 function simularRonda(players, situaciones, era) {
     console.log('\n--- Nueva Ronda ---');
@@ -304,15 +634,15 @@ function simularRonda(players, situaciones, era) {
     console.table(players.map(p => ({ id: p.id, ...p.recursos, pv: p.pv })));
 
     if (era === 1) {
-        for(i = 0; i < 2; i++) {
+        for(let i = 0; i < 2; i++) {
             players.forEach(jugador => {
-                hacerAccion(jugador, era);
+                jugador = hacerAccion(jugador, 1);
             });
         }
     } else {
-        for(i = 0; i < 3; i++) {
+        for(let i = 0; i < 3; i++) {
             players.forEach(jugador => {
-                hacerAccion(jugador, era);
+                jugador = hacerAccion(jugador, 2);
             });
         }
     }
@@ -320,20 +650,15 @@ function simularRonda(players, situaciones, era) {
     console.table(players.map(p => ({ id: p.id, ...p.recursos, pv: p.pv })));
 }
 
-// Simula acciones para cada jugador
-function hacerAccion(jugador, era) {
-
-}
-
 // Inicializar el juego y simular las 8 rondas
 // Ver orden de arranque
 const players = initGame(3);
-for(i = 0; i < 4; i++) {
+for(let i = 0; i < 4; i++) {
     simularRonda(players, situacionesEra1, 1);
 }
-for(i = 0; i < 4; i++) {
-    simularRonda(players, situacionesEra2, 2);
-}
+//for(let i = 0; i < 4; i++) {
+    //simularRonda(players, situacionesEra2, 2);
+//}
 
 console.log('\n--- Estado Final de Jugadores ---');
 console.table(players.map(p => ({ id: p.id, ...p.recursos, pv: p.pv })));
