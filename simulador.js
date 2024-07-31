@@ -226,64 +226,64 @@ function generarRecursos(players) {
         player.recursos.GAN += player.produccion.GAN + player.produccionTemporal.GAN;
         player.recursos.GRA += player.produccion.GRA + player.produccionTemporal.GRA;
         player.produccionTemporal = {};
-    });
 
-    // Recursos adicionales por edificios
-    let edificiosConPobladores = 0;
-    player.edificios.forEach(edificio => {
-        player.recursos[edificio.recurso] += edificio.poblador ? 2 : 1;
-        if (edificio.poblador) {
-            edificiosConPobladores++;
-        }
-    });
-
-    // Ajuste de recursos por pobladores y casas
-    const extraRecursos = Math.floor((player.pobladores - edificiosConPobladores) / 2);
-    let extra = Math.random(0, extraRecursos);
-    extraRecursos -= extra;
-    player.recursos.MET += player.edificios.some(e => e.recurso === 'MET') ? extra : 0;
-    extra = Math.random(0, extraRecursos);
-    extraRecursos -= extra;
-    player.recursos.MAD += player.edificios.some(e => e.recurso === 'MAD') ? extra : 0;
-    extra = Math.random(0, extraRecursos);
-    extraRecursos -= extra;
-    player.recursos.GAN += player.edificios.some(e => e.recurso === 'GAN') ? extra : 0;
-    extra = extraRecursos;
-    extraRecursos -= extra;
-    player.recursos.GRA += player.edificios.some(e => e.recurso === 'GRA') ? extra : 0;
-
-    // Descontar manutención por pobladores
-    const totalPobladores = player.pobladores + edificiosConPobladores
-    const manutencion = Math.floor(totalPobladores / 4);
-    while(manutencion > 0) {
-        if(Math.random(0, 1) === 0) {
-            if(player.recursos.GRA > 0) {
-                player.recursos.GRA--;
-                manutencion--;
-            } else if(player.recursos.GAN > 0) {
-                player.recursos.GAN-
-                manutencion--;
-            } else {
-                break;
+        // Recursos adicionales por edificios
+        let edificiosConPobladores = 0;
+        player.edificios.forEach(edificio => {
+            player.recursos[edificio.recurso] += edificio.poblador ? 2 : 1;
+            if (edificio.poblador) {
+                edificiosConPobladores++;
             }
+        });
+
+        // Ajuste de recursos por pobladores y casas
+        let extraRecursos = Math.floor((player.pobladores - edificiosConPobladores) / 2);
+        let extra = Math.random(0, extraRecursos);
+        extraRecursos -= extra;
+        player.recursos.MET += player.edificios.some(e => e.recurso === 'MET') ? extra : 0;
+        extra = Math.random(0, extraRecursos);
+        extraRecursos -= extra;
+        player.recursos.MAD += player.edificios.some(e => e.recurso === 'MAD') ? extra : 0;
+        extra = Math.random(0, extraRecursos);
+        extraRecursos -= extra;
+        player.recursos.GAN += player.edificios.some(e => e.recurso === 'GAN') ? extra : 0;
+        extra = extraRecursos;
+        extraRecursos -= extra;
+        player.recursos.GRA += player.edificios.some(e => e.recurso === 'GRA') ? extra : 0;
+
+        // Descontar manutención por pobladores
+        const totalPobladores = player.pobladores + edificiosConPobladores
+        const manutencion = Math.floor(totalPobladores / 4);
+        while(manutencion > 0) {
+            if(Math.random(0, 1) === 0) {
+                if(player.recursos.GRA > 0) {
+                    player.recursos.GRA--;
+                    manutencion--;
+                } else if(player.recursos.GAN > 0) {
+                    player.recursos.GAN-
+                    manutencion--;
+                } else {
+                    break;
+                }
+            } else {
+                if(player.recursos.GAN > 0) {
+                    player.recursos.GAN--;
+                    manutencion--;
+                } else if(player.recursos.GRA > 0) {
+                    player.recursos.GRA--;
+                    manutencion--;
+                } else {
+                    break;
+                }
+            }
+        }
+        const descuentoPobladores = 2 * manutencion;
+        if (player.pobladores > descuentoPobladores) {
+            player.pobladores -= descuentoPobladores;
         } else {
-            if(player.recursos.GAN > 0) {
-                player.recursos.GAN--;
-                manutencion--;
-            } else if(player.recursos.GRA > 0) {
-                player.recursos.GRA--;
-                manutencion--;
-            } else {
-                break;
-            }
+            player.pobladores = 0;
         }
-    }
-    const descuentoPobladores = 2 * manutencion;
-    if (player.pobladores > descuentoPobladores) {
-        player.pobladores -= descuentoPobladores;
-    } else {
-        player.pobladores = 0;
-    }
+    });
 };
 
 // Resolución de situaciones
