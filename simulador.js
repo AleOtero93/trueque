@@ -186,7 +186,7 @@ function initGame(numPlayers) {
             id: index + 1,
             poblado,
             recursos: { ...pobladoConfigs[poblado] },
-            produccion: pobladoConfigs,
+            produccion: pobladoConfigs[poblado],
             produccionTemporal: {},
             pc: 1,
             casas: 1,
@@ -195,25 +195,28 @@ function initGame(numPlayers) {
             artefactos: [],
             pv: 0
         });
+    });
 
-        // Hacer los recursos extra aca random
-        for (let i = 0; i < 2; i++) {
-            switch(Math.random(0, 3)) {
+    // Hacer los recursos extra aca random
+    for (let i = 0; i < 2; i++) {
+        for (let index = 0; index < players.length; index++) {
+            const valor = Math.floor(Math.random() * 4);
+            switch(valor) {
                 case 0:
-                    players[index].recursos.MET += 1
+                    players[index].recursos.MET++;
                     break;
                 case 1:
-                    players[index].recursos.MAD += 1
+                    players[index].recursos.MAD++;
                     break;
                 case 2:
-                    players[index].recursos.GAN += 1
+                    players[index].recursos.GAN++;
                     break;
                 case 3:
-                    players[index].recursos.GRA += 1
+                    players[index].recursos.GRA++;
                     break;
             }
         }
-    });
+    }
 
     return players;
 }
@@ -221,30 +224,37 @@ function initGame(numPlayers) {
 // Generar recursos para cada jugador
 function generarRecursos(players) {
     players.forEach(player => {
-        player.recursos.MET += player.produccion.MET + player.produccionTemporal.MET;
-        player.recursos.MAD += player.produccion.MAD + player.produccionTemporal.MAD;
-        player.recursos.GAN += player.produccion.GAN + player.produccionTemporal.GAN;
-        player.recursos.GRA += player.produccion.GRA + player.produccionTemporal.GRA;
+        player.recursos.MET += player.produccion.MET + (player.produccionTemporal.MET ? player.produccionTemporal.MET : 0);
+        player.recursos.MAD += player.produccion.MAD + (player.produccionTemporal.MAD ? player.produccionTemporal.MAD : 0);
+        player.recursos.GAN += player.produccion.GAN + (player.produccionTemporal.GAN ? player.produccionTemporal.GAN : 0);
+        player.recursos.GRA += player.produccion.GRA + (player.produccionTemporal.GRA ? player.produccionTemporal.GRA : 0);
         player.produccionTemporal = {};
 
         // Recursos adicionales por edificios
         let edificiosConPobladores = 0;
         player.edificios.forEach(edificio => {
-            player.recursos[edificio.recurso] += edificio.poblador ? 2 : 1;
-            if (edificio.poblador) {
-                edificiosConPobladores++;
+            if (edificio.recurso === "PC") {
+                player.pc += edificio.poblador ? 2 : 1;
+                if (edificio.poblador) {
+                    edificiosConPobladores++;
+                }
+            } else {
+                player.recursos[edificio.recurso] += edificio.poblador ? 2 : 1;
+                if (edificio.poblador) {
+                    edificiosConPobladores++;
+                }
             }
         });
 
         // Ajuste de recursos por pobladores y casas
         let extraRecursos = Math.floor((player.pobladores - edificiosConPobladores) / 2);
-        let extra = Math.random(0, extraRecursos);
+        let extra = Math.floor(Math.random() * (extraRecursos + 1));
         extraRecursos -= extra;
         player.recursos.MET += player.edificios.some(e => e.recurso === 'MET') ? extra : 0;
-        extra = Math.random(0, extraRecursos);
+        extra = Math.floor(Math.random() * (extraRecursos + 1));
         extraRecursos -= extra;
         player.recursos.MAD += player.edificios.some(e => e.recurso === 'MAD') ? extra : 0;
-        extra = Math.random(0, extraRecursos);
+        extra = Math.floor(Math.random() * (extraRecursos + 1));
         extraRecursos -= extra;
         player.recursos.GAN += player.edificios.some(e => e.recurso === 'GAN') ? extra : 0;
         extra = extraRecursos;
@@ -255,7 +265,7 @@ function generarRecursos(players) {
         const totalPobladores = player.pobladores + edificiosConPobladores
         const manutencion = Math.floor(totalPobladores / 4);
         while(manutencion > 0) {
-            if(Math.random(0, 1) === 0) {
+            if(Math.floor(Math.random() * 2) === 0) {
                 if(player.recursos.GRA > 0) {
                     player.recursos.GRA--;
                     manutencion--;
@@ -284,6 +294,8 @@ function generarRecursos(players) {
             player.pobladores = 0;
         }
     });
+
+    return players;
 };
 
 // Resolución de situaciones
@@ -291,7 +303,7 @@ function resolverSituacion(players, situacion) {
     players.forEach(player => {
         const cumple = Object.entries(situacion.requerimientos).every(([recurso, cantidad]) => player.recursos[recurso] >= cantidad);
         // Por ahora todos quieren resolver
-        // const quiere = Math.random(0, 10) >= 4 ? true : false
+        // const quiere = Math.floor(Math.random() * 11) >= 4 ? true : false
         
         // if (cumple && quiere) {
         if (cumple) {
@@ -303,11 +315,12 @@ function resolverSituacion(players, situacion) {
             Object.entries(situacion.recompensas).forEach(([recurso, cantidad]) => {
                 if (recurso === "POB") {
                     if (player.pobladores < (player.casas * 4)) {
-                        player.pobladores++;
+                        player.pobladores += cantidad;
                     } else {
                         const recursoComida = _.some(["GAN", "GRA"]);
-                        player.recursos[recursoComida]++;
+                        player.recursos[recursoComida] += cantidad;
                     }
+                } else if (recurso === "PV") {
                 } else if (recurso.includes("_PROD")) {
                     recurso = recurso.substring(0,3);
                     player.produccionTemporal[recurso] = cantidad;
@@ -325,14 +338,19 @@ function resolverSituacion(players, situacion) {
                     } else {
                         player.pv--;
                     }
+                } else if (recurso === "PV") {
                 } else if (recurso.includes("_PROD")) {
                     recurso = recurso.substring(0,3);
                     player.produccionTemporal[recurso] = cantidad;
                 } else {
-                    player.recursos[recurso] -= cantidad;
+                    if (player.recursos[recurso] > cantidad) {
+                        player.recursos[recurso] -= cantidad;
+                    } else {
+                        player.pv--;
+                    }
                 }
             });
-            player.pv += situacion.penalizaciones.PV || 0;
+            player.pv -= situacion.penalizaciones.PV || 0;
         }
     });
 }
@@ -434,7 +452,7 @@ function hacerAccion(jugador, era) {
         // Puede comprar edificio, casa, llamar poblador/es o pasar
         const madera = jugador.recursos.MAD;
         const comida = jugador.recursos.GRA + jugador.recursos.GAN;
-        const valorAleatorio = Math.random(0,10);
+        const valorAleatorio = Math.floor(Math.random() * 10);
         if (valorAleatorio === 0) {
             // Pasa
             return jugador;
@@ -448,10 +466,10 @@ function hacerAccion(jugador, era) {
             // Llama pobladores
             if (comida > 2 && ((jugador.casas * 4) - 2) >= jugador.pobladores) {
                 jugador.pobladores += 2;
-                restarComida(jugador, 2);
+                jugador = restarComida(jugador, 2);
             } else if (((jugador.casas * 4) - 1) >= jugador.pobladores) {
                 jugador.poladores++;
-                restarComida(jugador, 1);
+                jugador = restarComida(jugador, 1);
             }
             return jugador;
         } else {
@@ -469,7 +487,7 @@ function hacerAccion(jugador, era) {
                 } else {
                     // Edificio (si puede)
                     if (jugador.recursos.MET > 0 || jugador.recursos.GAN > 1) {
-                        const edificioDeseado = Math.random(0, 4);
+                        let edificioDeseado = Math.floor(Math.random() * 5);
                         let construyo = false;
                         let vueltaEntera = 0;
                         while(!construyo && vueltaEntera < 5) {
@@ -481,7 +499,7 @@ function hacerAccion(jugador, era) {
                                             if (edificio === "Mina" || edificio === "Aserradero") {
                                                 return true;
                                             }
-                                        }).count < (players.count - 1)) {
+                                        }).length < (players.length - 1)) {
                                             edificiosComprados.push("Mina");
                                             if (jugador.pobladores > 0) {
                                                 edificios[0].poblador = true;
@@ -502,7 +520,7 @@ function hacerAccion(jugador, era) {
                                             if (edificio === "Mina" || edificio === "Aserradero") {
                                                 return true;
                                             }
-                                        }).count < (players.count - 1)) {
+                                        }).length < (players.length - 1)) {
                                             edificiosComprados.push("Aserradero");
                                             if (jugador.pobladores > 0) {
                                                 edificios[1].poblador = true;
@@ -523,7 +541,7 @@ function hacerAccion(jugador, era) {
                                             if (edificio === "Corral" || edificio === "Molino") {
                                                 return true;
                                             }
-                                        }).count < (players.count - 1)) {
+                                        }).length < (players.length - 1)) {
                                             edificiosComprados.push("Corral");
                                             if (jugador.pobladores > 0) {
                                                 edificios[2].poblador = true;
@@ -544,7 +562,7 @@ function hacerAccion(jugador, era) {
                                             if (edificio === "Corral" || edificio === "Molino") {
                                                 return true;
                                             }
-                                        }).count < (players.count - 1)) {
+                                        }).length < (players.length - 1)) {
                                             edificiosComprados.push("Molino");
                                             if (jugador.pobladores > 0) {
                                                 edificios[3].poblador = true;
@@ -565,7 +583,7 @@ function hacerAccion(jugador, era) {
                                             if (edificio === "Mercado") {
                                                 return true;
                                             }
-                                        }).count < (players.count)) {
+                                        }).length < (players.length)) {
                                             edificiosComprados.push("Mercado");
                                             if (jugador.pobladores > 0) {
                                                 edificios[4].poblador = true;
@@ -599,10 +617,10 @@ function hacerAccion(jugador, era) {
                 // Llama pobladores
                 if (comida > 2 && ((jugador.casas * 4) - 2) >= jugador.pobladores) {
                     jugador.pobladores += 2;
-                    restarComida(jugador, 2);
+                    jugador = restarComida(jugador, 2);
                 } else if (((jugador.casas * 4) - 1) >= jugador.pobladores) {
                     jugador.poladores++;
-                    restarComida(jugador, 1);
+                    jugador = restarComida(jugador, 1);
                 }
                 return jugador;
             }
@@ -611,10 +629,35 @@ function hacerAccion(jugador, era) {
     }
 }
 
+// Resta la comida de la compra de pobladores
+function restarComida(jugador, cantidad) {
+    while(cantidad > 0) {
+        if(Math.floor(Math.random() * 2) === 0) {
+            if(jugador.recursos.GRA > 0) {
+                jugador.recursos.GRA--;
+                cantidad--;
+            } else {
+                jugador.recursos.GAN--;
+                cantidad--;
+            }
+        } else {
+            if(jugador.recursos.GAN > 0) {
+                jugador.recursos.GAN--;
+                cantidad--;
+            } else {
+                jugador.recursos.GRA--;
+                cantidad--;
+            }
+        }
+    }
+}
+
 // Simulación de una ronda del juego
-function simularRonda(players, situaciones, era) {
-    console.log('\n--- Nueva Ronda ---');
-    generarRecursos(players);
+function simularRonda(players, situaciones, era, ronda) {
+    console.log('\n--- Nueva Ronda: ' + (ronda + 1) + ' ---');
+    if (ronda > 0){
+        players = generarRecursos(players);
+    }
     console.log('\nRecursos Generados:');
     console.table(players.map(p => ({ id: p.id, ...p.recursos })));
 
@@ -631,7 +674,7 @@ function simularRonda(players, situaciones, era) {
 
     resolverSituacion(players, situacion);
     console.log('\nDespués de Resolver Situación:');
-    console.table(players.map(p => ({ id: p.id, ...p.recursos, pv: p.pv })));
+    console.table(players.map(p => ({ id: p.id, ...p.recursos, pv: p.pv, pc: p.pc, pobladores: p.pobladores, edificios: (p.edificios.map(e => e.nombre)) })));
 
     if (era === 1) {
         for(let i = 0; i < 2; i++) {
@@ -647,18 +690,20 @@ function simularRonda(players, situaciones, era) {
         }
     }
     console.log('\Después de hacer las acciones:');
-    console.table(players.map(p => ({ id: p.id, ...p.recursos, pv: p.pv })));
+    console.table(players.map(p => ({ id: p.id, ...p.recursos, pv: p.pv, pc: p.pc, pobladores: p.pobladores, edificios: (p.edificios.map(e => e.nombre)) })));
 }
 
 // Inicializar el juego y simular las 8 rondas
 // Ver orden de arranque
 const players = initGame(3);
+console.log('\n--- Inicio de Partida ---');
+console.table(players.map(p => ({ id: p.id, ...p.recursos })));
 for(let i = 0; i < 4; i++) {
-    simularRonda(players, situacionesEra1, 1);
+    simularRonda(players, situacionesEra1, 1, i);
 }
 //for(let i = 0; i < 4; i++) {
     //simularRonda(players, situacionesEra2, 2);
 //}
 
 console.log('\n--- Estado Final de Jugadores ---');
-console.table(players.map(p => ({ id: p.id, ...p.recursos, pv: p.pv })));
+console.table(players.map(p => ({ id: p.id, ...p.recursos, pv: p.pv, pc: p.pc, pobladores: p.pobladores, edificios: (p.edificios.map(e => e.nombre)) })));
