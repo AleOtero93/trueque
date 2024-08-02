@@ -263,7 +263,7 @@ function generarRecursos(players) {
 
         // Descontar manutención por pobladores
         const totalPobladores = player.pobladores + edificiosConPobladores
-        const manutencion = Math.floor(totalPobladores / 4);
+        let manutencion = Math.floor(totalPobladores / 4);
         while(manutencion > 0) {
             if(Math.floor(Math.random() * 2) === 0) {
                 if(player.recursos.GRA > 0) {
