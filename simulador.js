@@ -15,6 +15,7 @@ const edificios = [
 
 const situacionesEra1 = [
     {
+        id: 1,
         nombre: 'Hambruna',
         era: 1,
         requerimientos: { GAN: 2, GRA: 2 },
@@ -22,6 +23,7 @@ const situacionesEra1 = [
         penalizaciones: { GAN: 1, GRA_PROD: -1 },
     },
     {
+        id: 2,
         nombre: 'Hambruna',
         era: 1,
         requerimientos: { GAN: 2, GRA: 2 },
@@ -29,6 +31,7 @@ const situacionesEra1 = [
         penalizaciones: { GAN: 1, GRA_PROD: -1 },
     },
     {
+        id: 3,
         nombre: 'Incendio',
         era: 1,
         requerimientos: { MET: 2, GRA: 3 },
@@ -36,6 +39,7 @@ const situacionesEra1 = [
         penalizaciones: { MAD: 1, MAD_PROD: -1 },
     },
     {
+        id: 4,
         nombre: 'Incendio',
         era: 1,
         requerimientos: { MET: 2, GRA: 3 },
@@ -43,6 +47,7 @@ const situacionesEra1 = [
         penalizaciones: { MAD: 1, MAD_PROD: -1 },
     },
     {
+        id: 5,
         nombre: 'Guerra',
         era: 1,
         requerimientos: { MET: 3, GAN: 2 },
@@ -50,6 +55,7 @@ const situacionesEra1 = [
         penalizaciones: { POB: 2 },
     },
     {
+        id: 6,
         nombre: 'Saqueos Nómadas',
         era: 1,
         requerimientos: { MET: 1, MAD: 1, GAN: 3, GRA: 1 },
@@ -57,6 +63,7 @@ const situacionesEra1 = [
         penalizaciones: { PV: 1, GRA: 1, GAN_PROD: -1 },
     },
     {
+        id: 7,
         nombre: 'Saqueos Nómadas',
         era: 1,
         requerimientos: { MET: 1, MAD: 1, GAN: 3, GRA: 1 },
@@ -64,6 +71,7 @@ const situacionesEra1 = [
         penalizaciones: { PV: 1, GRA: 1, GAN_PROD: -1 },
     },
     {
+        id: 8,
         nombre: 'Crecimiento',
         era: 1,
         requerimientos: { MET: 1, MAD: 2, GAN: 2, GRA: 2 },
@@ -71,6 +79,7 @@ const situacionesEra1 = [
         penalizaciones: {},
     },
     {
+        id: 9,
         nombre: 'Terremoto',
         era: 1,
         requerimientos: { MET: 2, MAD: 2, GAN: 2, GRA: 1 },
@@ -224,11 +233,41 @@ function initGame(numPlayers) {
 // Generar recursos para cada jugador
 function generarRecursos(players) {
     players.forEach(player => {
-        player.recursos.MET += player.produccion.MET + (player.produccionTemporal.MET ? player.produccionTemporal.MET : 0);
-        player.recursos.MAD += player.produccion.MAD + (player.produccionTemporal.MAD ? player.produccionTemporal.MAD : 0);
-        player.recursos.GAN += player.produccion.GAN + (player.produccionTemporal.GAN ? player.produccionTemporal.GAN : 0);
-        player.recursos.GRA += player.produccion.GRA + (player.produccionTemporal.GRA ? player.produccionTemporal.GRA : 0);
+        const recursos = ['MET', 'MAD', 'GAN', 'GRA'];
+        recursos.forEach(recurso => {
+            let produccionTotal = player.produccion[recurso] + (player.produccionTemporal[recurso] || 0);
+            
+            if (produccionTotal < 0) {
+                // Necesitamos cubrir el déficit utilizando otros recursos
+                let deficit = Math.abs(produccionTotal);
+                
+                // Tratar de cubrir el déficit con otros recursos con producción positiva
+                recursos.forEach(otherRecurso => {
+                    if (recurso !== otherRecurso && deficit > 0) {
+                        let disponibleParaCubrir = player.produccion[otherRecurso] + (player.produccionTemporal[otherRecurso] || 0);
+                        if (disponibleParaCubrir > 0) {
+                            let cantidadUsada = Math.min(disponibleParaCubrir, deficit);
+                            player.recursos[otherRecurso] -= cantidadUsada;
+                            deficit -= cantidadUsada;
+                        }
+                    }
+                });
+                
+                // Si aún hay déficit, se ignora o se maneja de otra manera según las reglas del juego
+                produccionTotal = 0;
+            }
+            
+            player.recursos[recurso] += produccionTotal;
+        });
+        
+        // Después de actualizar los recursos, limpiar la producción temporal
         player.produccionTemporal = {};
+
+        //player.recursos.MET += player.produccion.MET + (player.produccionTemporal.MET ? player.produccionTemporal.MET : 0);
+        //player.recursos.MAD += player.produccion.MAD + (player.produccionTemporal.MAD ? player.produccionTemporal.MAD : 0);
+        //player.recursos.GAN += player.produccion.GAN + (player.produccionTemporal.GAN ? player.produccionTemporal.GAN : 0);
+        //player.recursos.GRA += player.produccion.GRA + (player.produccionTemporal.GRA ? player.produccionTemporal.GRA : 0);
+        //player.produccionTemporal = {};
 
         // Recursos adicionales por edificios
         let edificiosConPobladores = 0;
@@ -313,7 +352,12 @@ function resolverSituacion(players, situacion) {
             });
             // Aplicar recompensas
             Object.entries(situacion.recompensas).forEach(([recurso, cantidad]) => {
-                if (recurso === "POB") {
+                if (recurso === 'REC') {
+                    let conversion = convertirREC(player, cantidad, 'recompensa');
+                    Object.keys(conversion).forEach(rec => {
+                        player.recursos[rec] = (player.recursos[rec] || 0) + conversion[rec];
+                    });
+                } else if (recurso === "POB") {
                     if (player.pobladores < (player.casas * 4)) {
                         player.pobladores += cantidad;
                     } else {
@@ -332,7 +376,12 @@ function resolverSituacion(players, situacion) {
         } else {
             // Aplicar penalizaciones
             Object.entries(situacion.penalizaciones).forEach(([recurso, cantidad]) => {
-                if (recurso === "POB") {
+                if (recurso === 'REC') {
+                    let conversion = convertirREC(player, cantidad, 'penalizacion');
+                    Object.keys(conversion).forEach(rec => {
+                        player.recursos[rec] = (player.recursos[rec] || 0) - conversion[rec];
+                    });
+                } else if (recurso === "POB") {
                     if (player.pobladores >= cantidad) {
                         player.pobladores -= cantidad;
                     } else {
@@ -343,7 +392,7 @@ function resolverSituacion(players, situacion) {
                     recurso = recurso.substring(0,3);
                     player.produccionTemporal[recurso] = cantidad;
                 } else {
-                    if (player.recursos[recurso] > cantidad) {
+                    if (player.recursos[recurso] >= cantidad) {
                         player.recursos[recurso] -= cantidad;
                     } else {
                         player.pv--;
@@ -352,6 +401,111 @@ function resolverSituacion(players, situacion) {
             });
             player.pv -= situacion.penalizaciones.PV || 0;
         }
+    });
+}
+
+// Función para convertir "REC" en recursos específicos
+function convertirREC(jugador, cantidad, tipo) {
+    let recursos = ['MET', 'MAD', 'GAN', 'GRA'];
+    let conversion = {};
+
+    if (tipo === 'recompensa') {
+        // Ordenar recursos por los que menos tiene el jugador
+        recursos.sort((a, b) => (jugador.recursos[a] || 0) - (jugador.recursos[b] || 0));
+    } else if (tipo === 'penalizacion') {
+        // Ordenar recursos por los que más tiene el jugador
+        recursos.sort((a, b) => (jugador.recursos[b] || 0) - (jugador.recursos[a] || 0));
+    }
+
+    // Asignar recursos según la cantidad de REC
+    for (let i = 0; i < cantidad; i++) {
+        let recurso = recursos[i % recursos.length];
+        conversion[recurso] = (conversion[recurso] || 0) + 1;
+    }
+
+    return conversion;
+}
+
+// Simular fase de comercio entre jugadores v2
+function generarTruequeInteligente(jugadores, situacion) {
+    // Paso 1: Calcular las necesidades y excesos de cada jugador
+    jugadores.forEach(jugador => {
+        jugador.necesidades = {};
+        jugador.excesos = {};
+
+        // Determinar las necesidades del jugador según la situación
+        Object.keys(situacion.requerimientos).forEach(recurso => {
+            const cantidadNecesaria = situacion.requerimientos[recurso];
+            const cantidadDisponible = jugador.recursos[recurso] || 0;
+
+            if (cantidadDisponible < cantidadNecesaria) {
+                jugador.necesidades[recurso] = cantidadNecesaria - cantidadDisponible;
+            }
+        });
+
+        // Determinar los excesos del jugador
+        Object.keys(jugador.recursos).forEach(recurso => {
+            const cantidadDisponible = jugador.recursos[recurso];
+            const cantidadNecesaria = situacion.requerimientos[recurso] || 0;
+
+            if (cantidadDisponible > cantidadNecesaria) {
+                jugador.excesos[recurso] = cantidadDisponible - cantidadNecesaria;
+            }
+        });
+    });
+
+    // Paso 2: Realizar trueques inteligentes entre los jugadores
+    jugadores.forEach(jugador => {
+        Object.keys(jugador.necesidades).forEach(recursoNecesitado => {
+            if (jugador.necesidades.recursoNecesitado <= 0) {
+            } else {
+                jugadores.forEach(otroJugador => {
+                    if (jugador !== otroJugador && otroJugador.excesos[recursoNecesitado]) {
+                        let cantidadIntercambiada = 0;
+                        if (jugador.necesidades[recursoNecesitado] && otroJugador.excesos[recursoNecesitado]) {
+                            cantidadIntercambiada = Math.min(
+                                jugador.necesidades[recursoNecesitado],
+                                otroJugador.excesos[recursoNecesitado]
+                            );
+                        }
+                        if (cantidadIntercambiada == 'NaN' || cantidadIntercambiada == NaN) {
+                            cantidadIntercambiada = 0;
+                        }
+    
+                        // Realizar el trueque
+                        jugador.recursos[recursoNecesitado] = (jugador.recursos[recursoNecesitado] || 0) + cantidadIntercambiada;
+                        otroJugador.recursos[recursoNecesitado] -= cantidadIntercambiada;
+    
+                        // Actualizar las necesidades y excesos después del trueque
+                        jugador.necesidades[recursoNecesitado] -= cantidadIntercambiada;
+                        if (jugador.necesidades[recursoNecesitado] <= 0) {
+                            delete jugador.necesidades[recursoNecesitado];
+                        }
+    
+                        if (!otroJugador.excesos[recursoNecesitado]) {
+                            delete otroJugador.excesos[recursoNecesitado];
+                        } else {
+                            otroJugador.excesos[recursoNecesitado] -= cantidadIntercambiada;
+                        }
+    
+                        // Agregar la contraparte del trueque (el recurso que el jugador tiene en exceso)
+                        /*const recursoOfrecido = Object.keys(jugador.excesos).find(recurso => jugador.excesos[recurso] > 0);
+                        if (recursoOfrecido) {
+                            jugador.recursos[recursoOfrecido] -= cantidadIntercambiada;
+                            otroJugador.recursos[recursoOfrecido] = (otroJugador.recursos[recursoOfrecido] || 0) + cantidadIntercambiada;
+    
+                            jugador.excesos[recursoOfrecido] -= cantidadIntercambiada;
+                            if (jugador.excesos[recursoOfrecido] <= 0) {
+                                delete jugador.excesos[recursoOfrecido];
+                            }
+    
+                            otroJugador.excesos[recursoOfrecido] += cantidadIntercambiada;
+                        }*/
+                    }
+                });
+            }
+        });
+        //exit;
     });
 }
 
@@ -662,11 +816,15 @@ function simularRonda(players, situaciones, era, ronda) {
     console.table(players.map(p => ({ id: p.id, ...p.recursos })));
 
     const situacion = _.sample(situaciones);
+    const index = situaciones.indexOf(situacion);
+    if (index > -1) {
+        situaciones.splice(index, 1);
+    }
     console.log('\nSituación:', situacion.nombre);
 
-    //comercioEntreJugadores(players);
-    //console.log('\nDespués de Comercio Entre Jugadores:');
-    //console.table(players.map(p => ({ id: p.id, ...p.recursos, pc: p.pc })));
+    generarTruequeInteligente(players, situacion);
+    console.log('\nDespués de Comercio Entre Jugadores:');
+    console.table(players.map(p => ({ id: p.id, ...p.recursos, pv: p.pv, pc: p.pc, casas: p.casas, pobladores: p.pobladores, edificios: (p.edificios.map(e => e.nombre)) })));
 
     //comercioConPobladoNeutral(players);
     //console.log('\nDespués de Comercio con Poblado Neutral:');
@@ -674,7 +832,7 @@ function simularRonda(players, situaciones, era, ronda) {
 
     resolverSituacion(players, situacion);
     console.log('\nDespués de Resolver Situación:');
-    console.table(players.map(p => ({ id: p.id, ...p.recursos, pv: p.pv, pc: p.pc, pobladores: p.pobladores, edificios: (p.edificios.map(e => e.nombre)) })));
+    console.table(players.map(p => ({ id: p.id, ...p.recursos, pv: p.pv, pc: p.pc, casas: p.casas, pobladores: p.pobladores, edificios: (p.edificios.map(e => e.nombre)) })));
 
     if (era === 1) {
         for(let i = 0; i < 2; i++) {
@@ -690,7 +848,7 @@ function simularRonda(players, situaciones, era, ronda) {
         }
     }
     console.log('\Después de hacer las acciones:');
-    console.table(players.map(p => ({ id: p.id, ...p.recursos, pv: p.pv, pc: p.pc, pobladores: p.pobladores, edificios: (p.edificios.map(e => e.nombre)) })));
+    console.table(players.map(p => ({ id: p.id, ...p.recursos, pv: p.pv, pc: p.pc, casas: p.casas, pobladores: p.pobladores, edificios: (p.edificios.map(e => e.nombre)) })));
 }
 
 // Inicializar el juego y simular las 8 rondas
@@ -706,4 +864,4 @@ for(let i = 0; i < 4; i++) {
 //}
 
 console.log('\n--- Estado Final de Jugadores ---');
-console.table(players.map(p => ({ id: p.id, ...p.recursos, pv: p.pv, pc: p.pc, pobladores: p.pobladores, edificios: (p.edificios.map(e => e.nombre)) })));
+console.table(players.map(p => ({ id: p.id, ...p.recursos, pv: p.pv, pc: p.pc, casas: p.casas, pobladores: p.pobladores, edificios: (p.edificios.map(e => e.nombre)) })));
